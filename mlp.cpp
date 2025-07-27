@@ -20,100 +20,82 @@ double MLP::tanh_derivative(double x) const {
     return 1.0 - t * t;
 }
 
-// Matrix multiplication: A @ x where A is matrix and x is vector
-std::vector<double> MLP::matmul(const std::vector<std::vector<double>>& A,
-                               const std::vector<double>& x) const {
-    std::vector<double> result(A.size(), 0.0);
-    for (size_t i = 0; i < A.size(); i++) {
-        for (size_t j = 0; j < x.size(); j++) {
-            result[i] += A[i][j] * x[j];
-        }
+void MLP::matmul(const std::vector<double>& A,
+                 const std::array<double, 2>& x,
+                 std::vector<double>& result) const {
+    for (int i = 0; i < hidden_size1; i++) {
+        result[i] = A[i] * x[0] + A[i + hidden_size1] * x[1];
     }
-    return result;
 }
 
-// Outer product: a[:, None] @ b[None, :] in numpy
-std::vector<std::vector<double>> MLP::outer(const std::vector<double>& a,
-                                          const std::vector<double>& b) const {
-    std::vector<std::vector<double>> result(a.size(), std::vector<double>(b.size()));
-    for (size_t i = 0; i < a.size(); i++) {
-        for (size_t j = 0; j < b.size(); j++) {
-            result[i][j] = a[i] * b[j];
+void MLP::matmul(const std::vector<double>& A,
+                 const std::vector<double>& x,
+                 std::vector<double>& result) const {
+    for (int i = 0; i < hidden_size2; i++) {
+        double sum = 0.0;
+        for (int j = 0; j < hidden_size1; j++) {
+            sum += A[i * hidden_size1 + j] * x[j];
         }
+        result[i] = sum;
     }
-    return result;
 }
 
 MLP::MLP() 
     : hidden_size1(64),
       hidden_size2(64),
-      input_weights(hidden_size1, std::vector<double>(2)),
-      hidden_weights(hidden_size2, std::vector<double>(hidden_size1)),
+      input_weights(hidden_size1 * 2),
+      hidden_weights(hidden_size2 * hidden_size1),
       output_weights(hidden_size2),
       input_biases(hidden_size1),
       hidden_biases(hidden_size2),
-      output_bias(0.0) {
+      output_bias(0.0),
+      hidden1_raw_buffer(hidden_size1),
+      hidden1_buffer(hidden_size1),
+      hidden2_raw_buffer(hidden_size2),
+      hidden2_buffer(hidden_size2),
+      d_hidden1_buffer(hidden_size1),
+      d_hidden2_buffer(hidden_size2) {
     
-    std::mt19937 gen(5489);  // Python과 동일한 시드값 사용
+    std::mt19937 gen(5489);
     
     double scale_input = std::sqrt(2.0 / 2);
     double scale_h = std::sqrt(2.0 / hidden_size1);
     double scale_out = std::sqrt(2.0 / hidden_size2);
     
-    // Initialize input_weights (hidden_size1, 2)
     std::normal_distribution<> d_input(0, scale_input);
-    for (auto& row : input_weights) {
-        for (auto& w : row) {
-            w = d_input(gen);
-        }
-    }
+    for (auto& w : input_weights) w = d_input(gen);
     
-    // Initialize hidden_weights (hidden_size2, hidden_size1)
     std::normal_distribution<> d_h(0, scale_h);
-    for (auto& row : hidden_weights) {
-        for (auto& w : row) {
-            w = d_h(gen);
-        }
-    }
+    for (auto& w : hidden_weights) w = d_h(gen);
     
-    // Initialize output_weights (hidden_size2,)
     std::normal_distribution<> d_out(0, scale_out);
-    for (auto& w : output_weights) {
-        w = d_out(gen);
-    }
+    for (auto& w : output_weights) w = d_out(gen);
     
-    // Initialize biases to zeros
     std::fill(input_biases.begin(), input_biases.end(), 0.0);
     std::fill(hidden_biases.begin(), hidden_biases.end(), 0.0);
 }
 
 double MLP::forward(double x, double y) const {
-    std::vector<double> input_vec = {x, y};
+    const std::array<double, 2> input_vec = {x, y};
     
     // First hidden layer
-    auto hidden1_raw = matmul(input_weights, input_vec);
-    for (size_t i = 0; i < hidden1_raw.size(); i++) {
-        hidden1_raw[i] += input_biases[i];
-    }
-    std::vector<double> hidden1(hidden1_raw.size());
-    for (size_t i = 0; i < hidden1.size(); i++) {
-        hidden1[i] = tanh(hidden1_raw[i]);
+    matmul(input_weights, input_vec, hidden1_raw_buffer);
+    for (int i = 0; i < hidden_size1; i++) {
+        hidden1_raw_buffer[i] += input_biases[i];
+        hidden1_buffer[i] = tanh(hidden1_raw_buffer[i]);
     }
     
     // Second hidden layer
-    auto hidden2_raw = matmul(hidden_weights, hidden1);
-    for (size_t i = 0; i < hidden2_raw.size(); i++) {
-        hidden2_raw[i] += hidden_biases[i];
-    }
-    std::vector<double> hidden2(hidden2_raw.size());
-    for (size_t i = 0; i < hidden2.size(); i++) {
-        hidden2[i] = tanh(hidden2_raw[i]);
+    matmul(hidden_weights, hidden1_buffer, hidden2_raw_buffer);
+    for (int i = 0; i < hidden_size2; i++) {
+        hidden2_raw_buffer[i] += hidden_biases[i];
+        hidden2_buffer[i] = tanh(hidden2_raw_buffer[i]);
     }
     
     // Output layer
     double output_raw = 0.0;
-    for (size_t i = 0; i < hidden_size2; i++) {
-        output_raw += output_weights[i] * hidden2[i];
+    for (int i = 0; i < hidden_size2; i++) {
+        output_raw += hidden2_buffer[i] * output_weights[i];
     }
     output_raw += output_bias;
     
@@ -130,31 +112,25 @@ void MLP::train(const std::vector<std::vector<double>>& data,
         double total_loss = 0.0;
         
         for (size_t idx = 0; idx < data.size(); idx++) {
-            std::vector<double> input_vec = {data[idx][0], data[idx][1]};
-            double target = labels[idx];
+            const std::array<double, 2> input_vec = {data[idx][0], data[idx][1]};
+            const double target = labels[idx];
             
             // Forward pass
-            auto hidden1_raw = matmul(input_weights, input_vec);
-            for (size_t i = 0; i < hidden1_raw.size(); i++) {
-                hidden1_raw[i] += input_biases[i];
-            }
-            std::vector<double> hidden1(hidden1_raw.size());
-            for (size_t i = 0; i < hidden1.size(); i++) {
-                hidden1[i] = tanh(hidden1_raw[i]);
+            matmul(input_weights, input_vec, hidden1_raw_buffer);
+            for (int i = 0; i < hidden_size1; i++) {
+                hidden1_raw_buffer[i] += input_biases[i];
+                hidden1_buffer[i] = tanh(hidden1_raw_buffer[i]);
             }
             
-            auto hidden2_raw = matmul(hidden_weights, hidden1);
-            for (size_t i = 0; i < hidden2_raw.size(); i++) {
-                hidden2_raw[i] += hidden_biases[i];
-            }
-            std::vector<double> hidden2(hidden2_raw.size());
-            for (size_t i = 0; i < hidden2.size(); i++) {
-                hidden2[i] = tanh(hidden2_raw[i]);
+            matmul(hidden_weights, hidden1_buffer, hidden2_raw_buffer);
+            for (int i = 0; i < hidden_size2; i++) {
+                hidden2_raw_buffer[i] += hidden_biases[i];
+                hidden2_buffer[i] = tanh(hidden2_raw_buffer[i]);
             }
             
             double output_raw = 0.0;
-            for (size_t i = 0; i < hidden_size2; i++) {
-                output_raw += output_weights[i] * hidden2[i];
+            for (int i = 0; i < hidden_size2; i++) {
+                output_raw += hidden2_buffer[i] * output_weights[i];
             }
             output_raw += output_bias;
             double output = sigmoid(output_raw);
@@ -164,46 +140,46 @@ void MLP::train(const std::vector<std::vector<double>>& data,
             total_loss += loss;
             
             // Backward pass
-            double d_output = (output - target) * sigmoid_derivative(output_raw);
+            // Use output*(1-output) instead of sigmoid_derivative
+            double d_output = (output - target) * (output * (1.0 - output));
             
-            // d_hidden2: element-wise multiplication
-            std::vector<double> d_hidden2(hidden_size2);
-            for (size_t i = 0; i < hidden_size2; i++) {
-                d_hidden2[i] = d_output * output_weights[i] * tanh_derivative(hidden2_raw[i]);
+            // Calculate d_hidden2 using stored activation values
+            for (int i = 0; i < hidden_size2; i++) {
+                const double g2 = 1.0 - hidden2_buffer[i] * hidden2_buffer[i];  // tanh derivative using stored activation
+                d_hidden2_buffer[i] = d_output * output_weights[i] * g2;
             }
             
-            // d_hidden1: matrix multiplication and element-wise multiplication
-            std::vector<double> d_hidden1(hidden_size1, 0.0);
-            for (size_t i = 0; i < hidden_size1; i++) {
-                for (size_t j = 0; j < hidden_size2; j++) {
-                    d_hidden1[i] += d_hidden2[j] * hidden_weights[j][i];
+            // Calculate d_hidden1 using stored activation values
+            for (int i = 0; i < hidden_size1; i++) {
+                double sum = 0.0;
+                for (int j = 0; j < hidden_size2; j++) {
+                    sum += d_hidden2_buffer[j] * hidden_weights[j * hidden_size1 + i];
                 }
-                d_hidden1[i] *= tanh_derivative(hidden1_raw[i]);
+                const double g1 = 1.0 - hidden1_buffer[i] * hidden1_buffer[i];  // tanh derivative using stored activation
+                d_hidden1_buffer[i] = sum * g1;
             }
             
             // Update weights and biases
-            // Update output layer
-            for (size_t i = 0; i < hidden_size2; i++) {
-                output_weights[i] -= learning_rate * d_output * hidden2[i];
+            for (int i = 0; i < hidden_size2; i++) {
+                output_weights[i] -= learning_rate * d_output * hidden2_buffer[i];
             }
             output_bias -= learning_rate * d_output;
             
-            // Update hidden layer
-            auto d_hidden2_outer = outer(d_hidden2, hidden1);
-            for (size_t i = 0; i < hidden_size2; i++) {
-                for (size_t j = 0; j < hidden_size1; j++) {
-                    hidden_weights[i][j] -= learning_rate * d_hidden2_outer[i][j];
+            // Update hidden weights directly without outer product buffer
+            for (int i = 0; i < hidden_size2; i++) {
+                const double gi = d_hidden2_buffer[i];
+                for (int j = 0; j < hidden_size1; j++) {
+                    hidden_weights[i * hidden_size1 + j] -= learning_rate * gi * hidden1_buffer[j];
                 }
-                hidden_biases[i] -= learning_rate * d_hidden2[i];
+                hidden_biases[i] -= learning_rate * gi;
             }
             
-            // Update input layer
-            auto d_hidden1_outer = outer(d_hidden1, input_vec);
-            for (size_t i = 0; i < hidden_size1; i++) {
-                for (size_t j = 0; j < 2; j++) {
-                    input_weights[i][j] -= learning_rate * d_hidden1_outer[i][j];
-                }
-                input_biases[i] -= learning_rate * d_hidden1[i];
+            // Update input weights directly without outer product buffer
+            for (int i = 0; i < hidden_size1; i++) {
+                const double gi = d_hidden1_buffer[i];
+                input_weights[i] -= learning_rate * gi * input_vec[0];
+                input_weights[i + hidden_size1] -= learning_rate * gi * input_vec[1];
+                input_biases[i] -= learning_rate * gi;
             }
         }
         

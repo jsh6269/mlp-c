@@ -177,7 +177,7 @@ def main():
 
     mlp = MLP()
     mlp.train(data, labels, epochs=2000)
-    save_visualization(mlp, data, labels, "visualized_python_deep.png")
+    save_visualization(mlp, data, labels, "visualized_python.png")
 
     print("--------------------------------")
     print("Saved Result: visualized_python.png")

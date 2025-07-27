@@ -2,6 +2,7 @@
 #define MLP_H
 
 #include <vector>
+#include <array>
 #include <iostream>
 #include <chrono>
 
@@ -9,19 +10,29 @@ class MLP {
 private:
     const int hidden_size1;                           // 64
     const int hidden_size2;                           // 64
-    std::vector<std::vector<double>> input_weights;   // (hidden_size1, 2)
-    std::vector<std::vector<double>> hidden_weights;  // (hidden_size2, hidden_size1)
-    std::vector<double> output_weights;               // (hidden_size2,)
-    std::vector<double> input_biases;                 // (hidden_size1,)
-    std::vector<double> hidden_biases;                // (hidden_size2,)
+    std::vector<double> input_weights;                // [hidden_size1 * 2]
+    std::vector<double> hidden_weights;               // [hidden_size2 * hidden_size1]
+    std::vector<double> output_weights;               // [hidden_size2]
+    std::vector<double> input_biases;                 // [hidden_size1]
+    std::vector<double> hidden_biases;                // [hidden_size2]
     double output_bias;                               // scalar
     double training_time;                             // 학습 시간
 
+    // Reusable buffers
+    mutable std::vector<double> hidden1_raw_buffer;   // [hidden_size1]
+    mutable std::vector<double> hidden1_buffer;       // [hidden_size1]
+    mutable std::vector<double> hidden2_raw_buffer;   // [hidden_size2]
+    mutable std::vector<double> hidden2_buffer;       // [hidden_size2]
+    mutable std::vector<double> d_hidden1_buffer;     // [hidden_size1]
+    mutable std::vector<double> d_hidden2_buffer;     // [hidden_size2]
+
     // Helper functions
-    std::vector<double> matmul(const std::vector<std::vector<double>>& A, 
-                              const std::vector<double>& x) const;
-    std::vector<std::vector<double>> outer(const std::vector<double>& a, 
-                                         const std::vector<double>& b) const;
+    void matmul(const std::vector<double>& A, 
+                const std::array<double, 2>& x,
+                std::vector<double>& result) const;
+    void matmul(const std::vector<double>& A, 
+                const std::vector<double>& x,
+                std::vector<double>& result) const;
     double sigmoid(double x) const;
     double sigmoid_derivative(double x) const;
     double tanh(double x) const;
