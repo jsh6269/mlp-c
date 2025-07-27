@@ -30,7 +30,7 @@ cpu 기준으로 C++이 Python보다 얼마나 더 빠른지 알아봅시다~!
 
 ```bash
 # MinGW g++ 사용
-g++ main.cpp mlp.cpp -lgdiplus
+g++ main.cpp mlp.cpp -lgdiplu
 
 # 실행
 ./a

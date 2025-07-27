@@ -7,12 +7,25 @@
 
 class MLP {
 private:
-    std::vector<double> input_weights;    // 입력층 -> 은닉층 가중치
-    std::vector<double> hidden_weights;   // 은닉층 -> 출력층 가중치
-    double input_bias;                    // 입력층 편향
-    double hidden_bias;                   // 은닉층 편향
-    const int hidden_size;                // 은닉층 뉴런 수
-    double training_time;                 // 학습 시간
+    const int hidden_size1;                           // 64
+    const int hidden_size2;                           // 64
+    std::vector<std::vector<double>> input_weights;   // (hidden_size1, 2)
+    std::vector<std::vector<double>> hidden_weights;  // (hidden_size2, hidden_size1)
+    std::vector<double> output_weights;               // (hidden_size2,)
+    std::vector<double> input_biases;                 // (hidden_size1,)
+    std::vector<double> hidden_biases;                // (hidden_size2,)
+    double output_bias;                               // scalar
+    double training_time;                             // 학습 시간
+
+    // Helper functions
+    std::vector<double> matmul(const std::vector<std::vector<double>>& A, 
+                              const std::vector<double>& x) const;
+    std::vector<std::vector<double>> outer(const std::vector<double>& a, 
+                                         const std::vector<double>& b) const;
+    double sigmoid(double x) const;
+    double sigmoid_derivative(double x) const;
+    double tanh(double x) const;
+    double tanh_derivative(double x) const;
 
 public:
     MLP();
@@ -21,11 +34,11 @@ public:
 
     void train(const std::vector<std::vector<double>>& data, 
                const std::vector<double>& labels,
-               int epochs = 1000, 
-               double learning_rate = 0.1);
+               int epochs = 2000, 
+               double learning_rate = 0.05);
 
     double getAccuracy(const std::vector<std::vector<double>>& data, 
-                       const std::vector<double>& labels) const;
+                      const std::vector<double>& labels) const;
 
     double getTrainingTime() const;
 };
