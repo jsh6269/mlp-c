@@ -23,4 +23,4 @@ Epoch 1900, Loss: 0.000205
 --------------------------------
 Saved Result: visualized_python.png
 Train Accuracy: 100%
-Train Time: 19674ms
+Train Time: 8026ms

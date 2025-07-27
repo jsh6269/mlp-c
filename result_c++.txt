@@ -22,4 +22,4 @@ Epoch 1700, Loss: 0.000148412
 Epoch 1800, Loss: 0.000136482
 Epoch 1900, Loss: 0.000126194
 Train Accuracy: 100%
-Train Time: 3378 ms
+Train Time: 793 ms
