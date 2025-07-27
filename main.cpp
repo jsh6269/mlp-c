@@ -102,6 +102,18 @@ void saveVisualization(const MLP& mlp,
 }
 
 int main() {
+    auto start_time = std::chrono::high_resolution_clock::now();
+    std::cout << "Size of double: " << sizeof(double) << " bytes" << std::endl;
+    
+    double test_value = 0.1;
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(&test_value);
+    std::cout << "Internal representation of 0.1: ";
+    for(size_t i = 0; i < sizeof(double); ++i) {
+        std::cout << std::hex << static_cast<int>(bytes[i]) << " ";
+    }
+    std::cout << std::dec << std::endl;
+    std::cout << "--------------------------------" << std::endl;
+    
     // 학습 데이터 생성
     std::vector<std::vector<double>> data = {
         {10, 23}, {4, 21}, {8, 17}, {17, 22}, {3, 12}, {9, 12}, {16, 14}, {21, 20}, {26, 22}, // upper
@@ -124,12 +136,17 @@ int main() {
     mlp.train(data, labels);
     
     // 결과를 이미지 파일로 저장
-    saveVisualization(mlp, data, labels, L"visualized.png");
+    saveVisualization(mlp, data, labels, L"visualized_c++.png");
+    
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     
     std::cout << "--------------------------------" << std::endl;
-    std::cout << "Saved Result: visualized.png" << std::endl;
-    std::cout << "Training Accuracy: " << 100 * mlp.getAccuracy(data, labels) << "%" << std::endl;
-    std::cout << "Training Time: " << mlp.getTrainingTime() << "ms" << std::endl;
+    std::cout << "Saved Result: visualized_c++.png" << std::endl;
+    std::cout << "Train Accuracy: " << 100 * mlp.getAccuracy(data, labels) << "%" << std::endl;
+    std::cout << "Train Time: " << mlp.getTrainingTime() << "ms" << std::endl;
+    std::cout << "Overhead: " << total_time - mlp.getTrainingTime() << "ms" << std::endl;
+    std::cout << "Total Time: " << total_time << "ms" << std::endl;
     std::cout << std::endl;
     return 0;
 }

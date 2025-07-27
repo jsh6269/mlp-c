@@ -1,0 +1,22 @@
+$ g++ main.cpp mlp.cpp -lgdiplus
+$ ./a
+
+Size of double: 8 bytes
+Internal representation of 0.1: 9a 99 99 99 99 99 b9 3f
+--------------------------------
+Epoch 0, Loss: 0.128146
+Epoch 100, Loss: 0.125522
+Epoch 200, Loss: 0.119171
+Epoch 300, Loss: 0.0807721
+Epoch 400, Loss: 0.0394437
+Epoch 500, Loss: 0.0233728
+Epoch 600, Loss: 0.0160844
+Epoch 700, Loss: 0.0119884
+Epoch 800, Loss: 0.00938361
+Epoch 900, Loss: 0.00759817
+--------------------------------
+Saved Result: visualized_c++.png
+Train Accuracy: 100%
+Train Time: 30ms
+Overhead: 20ms
+Total Time: 50ms

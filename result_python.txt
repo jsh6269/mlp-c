@@ -1,0 +1,21 @@
+$ python mlp.py
+
+Size of np.float64: 8 bytes
+Internal representation of 0.1: 9a 99 99 99 99 99 b9 3f
+--------------------------------
+Epoch 0, Loss: 0.12570141
+Epoch 100, Loss: 0.12540505
+Epoch 200, Loss: 0.11750544
+Epoch 300, Loss: 0.07413800
+Epoch 400, Loss: 0.03645024
+Epoch 500, Loss: 0.02265857
+Epoch 600, Loss: 0.01623465
+Epoch 700, Loss: 0.01248550
+Epoch 800, Loss: 0.01000054
+Epoch 900, Loss: 0.00822607
+--------------------------------
+Saved Result: visualized_python.png
+Train Accuracy: 100%
+Train Time: 340ms
+Overhead: 97ms
+Total Time: 437ms
