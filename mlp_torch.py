@@ -32,7 +32,7 @@ class MLP(nn.Module):
         return x
 
 
-def train_model(model, data, labels, epochs=2000, lr=0.08):
+def train_model(model, data, labels, epochs=2000, lr=0.32):
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     criterion = nn.BCELoss()
     start = time.time()
@@ -131,7 +131,9 @@ def main():
     label_tensor = torch.tensor(labels, dtype=torch.float32)
 
     model = MLP()
-    train_time = train_model(model, data_tensor, label_tensor, epochs=2000)
+
+    # 배치학습에 대한 보정으로 학습률을 0.32로 높게 설정
+    train_time = train_model(model, data_tensor, label_tensor, epochs=2000, lr=0.32)
     accuracy = get_accuracy(model, data_tensor, label_tensor)
 
     save_visualization(model, data_tensor, label_tensor, "visualized_torch.png")

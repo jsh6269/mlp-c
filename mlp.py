@@ -51,7 +51,7 @@ class MLP:
 
         return output
 
-    def train(self, data, labels, epochs=2000, learning_rate=0.08):
+    def train(self, data, labels, epochs=2000, learning_rate=0.04):
         start = time.time()
         data = np.array(data)
         labels = np.array(labels)
@@ -176,7 +176,7 @@ def main():
     data[:, 1] /= 25.0
 
     mlp = MLP()
-    mlp.train(data, labels, epochs=2000)
+    mlp.train(data, labels, epochs=2000, learning_rate=0.04)
     save_visualization(mlp, data, labels, "visualized_python.png")
 
     print("--------------------------------")

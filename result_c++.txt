@@ -1,25 +1,25 @@
 $ g++ -I ./eigen-3.3.9 -O3 main.cpp mlp_eigen.cpp -lgdiplus
 $ ./a
 
-Epoch 0, Loss: 0.0960909
-Epoch 100, Loss: 0.015202
-Epoch 200, Loss: 0.00288346
-Epoch 300, Loss: 0.00131367
-Epoch 400, Loss: 0.000830639
-Epoch 500, Loss: 0.000534944
-Epoch 600, Loss: 0.000370302
-Epoch 700, Loss: 0.000278004
-Epoch 800, Loss: 0.000220862
-Epoch 900, Loss: 0.000182356
-Epoch 1000, Loss: 0.000154759
-Epoch 1100, Loss: 0.000134063
-Epoch 1200, Loss: 0.000117998
-Epoch 1300, Loss: 0.000105186
-Epoch 1400, Loss: 9.47435e-05
-Epoch 1500, Loss: 8.60792e-05
-Epoch 1600, Loss: 7.87815e-05
-Epoch 1700, Loss: 7.25562e-05
-Epoch 1800, Loss: 6.71873e-05
-Epoch 1900, Loss: 6.25127e-05
+Epoch 0, Loss: 0.0985978
+Epoch 100, Loss: 0.0257474
+Epoch 200, Loss: 0.0125818
+Epoch 300, Loss: 0.00588285
+Epoch 400, Loss: 0.00286853
+Epoch 500, Loss: 0.00184622
+Epoch 600, Loss: 0.0013219
+Epoch 700, Loss: 0.000993406
+Epoch 800, Loss: 0.000773869
+Epoch 900, Loss: 0.000622243
+Epoch 1000, Loss: 0.000514119
+Epoch 1100, Loss: 0.000434488
+Epoch 1200, Loss: 0.00037406
+Epoch 1300, Loss: 0.000326984
+Epoch 1400, Loss: 0.000289467
+Epoch 1500, Loss: 0.000258984
+Epoch 1600, Loss: 0.000233801
+Epoch 1700, Loss: 0.000212695
+Epoch 1800, Loss: 0.000194784
+Epoch 1900, Loss: 0.000179419
 Train Accuracy: 100%
-Train Time: 788 ms
+Train Time: 858 ms

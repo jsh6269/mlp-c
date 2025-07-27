@@ -1,26 +1,26 @@
 $ python mlp.py
 
-Epoch 0, Loss: 0.104518
-Epoch 100, Loss: 0.017037
-Epoch 200, Loss: 0.004387
-Epoch 300, Loss: 0.002157
-Epoch 400, Loss: 0.001463
-Epoch 500, Loss: 0.001047
-Epoch 600, Loss: 0.000749
-Epoch 700, Loss: 0.000549
-Epoch 800, Loss: 0.000420
-Epoch 900, Loss: 0.000335
-Epoch 1000, Loss: 0.000275
-Epoch 1100, Loss: 0.000232
-Epoch 1200, Loss: 0.000200
-Epoch 1300, Loss: 0.000175
-Epoch 1400, Loss: 0.000155
-Epoch 1500, Loss: 0.000138
-Epoch 1600, Loss: 0.000125
-Epoch 1700, Loss: 0.000114
-Epoch 1800, Loss: 0.000104
-Epoch 1900, Loss: 0.000096
+Epoch 0, Loss: 0.109834
+Epoch 100, Loss: 0.031569
+Epoch 200, Loss: 0.014392
+Epoch 300, Loss: 0.007269
+Epoch 400, Loss: 0.003957
+Epoch 500, Loss: 0.002693
+Epoch 600, Loss: 0.002030
+Epoch 700, Loss: 0.001600
+Epoch 800, Loss: 0.001293
+Epoch 900, Loss: 0.001064
+Epoch 1000, Loss: 0.000890
+Epoch 1100, Loss: 0.000755
+Epoch 1200, Loss: 0.000650
+Epoch 1300, Loss: 0.000566
+Epoch 1400, Loss: 0.000498
+Epoch 1500, Loss: 0.000443
+Epoch 1600, Loss: 0.000397
+Epoch 1700, Loss: 0.000359
+Epoch 1800, Loss: 0.000326
+Epoch 1900, Loss: 0.000298
 --------------------------------
 Saved Result: visualized_python.png
 Train Accuracy: 100%
-Train Time: 7950ms
+Train Time: 7918ms

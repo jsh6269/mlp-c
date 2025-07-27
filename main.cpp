@@ -129,7 +129,7 @@ int main() {
     }
 
     MLP_Eigen mlp;
-    mlp.train(data, labels, 2000, 0.08);
+    mlp.train(data, labels, 2000, 0.04);
     saveVisualization(mlp, data, labels, L"visualized_c++.png");
 
     std::wcout << L"Train Accuracy: " 
