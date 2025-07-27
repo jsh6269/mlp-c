@@ -1,5 +1,5 @@
 // main.cpp
-#include "mlp.h"
+#include "mlp_eigen.h"
 #include <windows.h>
 #include <objidl.h>
 #include <gdiplus.h>
@@ -36,7 +36,7 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid) {
     return -1;
 }
 
-void saveVisualization(const MLP& mlp,
+void saveVisualization(const MLP_Eigen& mlp,
                        const std::vector<std::vector<double>>& data,
                        const std::vector<double>& labels,
                        const wchar_t* filename)
@@ -122,16 +122,15 @@ int main() {
         1, 1
     };
 
-
     // normalize
     for (auto &pt : data) {
         pt[0] /= 30.0;
         pt[1] /= 25.0;
     }
 
-    MLP mlp;
+    MLP_Eigen mlp;
     mlp.train(data, labels, 2000, 0.05);
-    saveVisualization(mlp, data, labels, L"visualized_python.png");
+    saveVisualization(mlp, data, labels, L"visualized_c++.png");
 
     std::wcout << L"Train Accuracy: " 
                << int(mlp.getAccuracy(data, labels)*100) 
@@ -139,6 +138,5 @@ int main() {
     std::wcout << L"Train Time: " 
                << mlp.getTrainingTime() 
                << L" ms\n";
-
     return 0;
 }

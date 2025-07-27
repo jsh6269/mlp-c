@@ -35,7 +35,7 @@ class MLP:
         return np.tanh(x)
 
     def tanh_derivative(self, x):
-        return 1.0 - np.tanh(x)**2
+        return 1.0 - np.square(np.tanh(x))
 
     def forward(self, x, y):
         input_vec = np.array([x, y])
@@ -75,8 +75,8 @@ class MLP:
                 loss = 0.5 * (target - output) ** 2
                 total_loss += loss
 
-                d_output = (output - target) * self.sigmoid_derivative(output_raw)
-
+                d_output = (output - target) * output * (1 - output)
+                
                 d_hidden2 = d_output * self.output_weights * self.tanh_derivative(hidden2_raw)
                 d_hidden1 = self.tanh_derivative(hidden1_raw) * (self.hidden_weights.T @ d_hidden2)
 

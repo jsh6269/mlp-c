@@ -1,22 +1,25 @@
-$ g++ main.cpp mlp.cpp -lgdiplus
+$ g++ -I ./eigen-3.3.9 -O3 main.cpp mlp_eigen.cpp -lgdiplus
 $ ./a
 
-Size of double: 8 bytes
-Internal representation of 0.1: 9a 99 99 99 99 99 b9 3f
---------------------------------
-Epoch 0, Loss: 0.128146
-Epoch 100, Loss: 0.125522
-Epoch 200, Loss: 0.119171
-Epoch 300, Loss: 0.0807721
-Epoch 400, Loss: 0.0394437
-Epoch 500, Loss: 0.0233728
-Epoch 600, Loss: 0.0160844
-Epoch 700, Loss: 0.0119884
-Epoch 800, Loss: 0.00938361
-Epoch 900, Loss: 0.00759817
---------------------------------
-Saved Result: visualized_c++.png
+Epoch 0, Loss: 0.0977973
+Epoch 100, Loss: 0.0216305
+Epoch 200, Loss: 0.00968341
+Epoch 300, Loss: 0.00329619
+Epoch 400, Loss: 0.00182044
+Epoch 500, Loss: 0.00122892
+Epoch 600, Loss: 0.000878967
+Epoch 700, Loss: 0.000656052
+Epoch 800, Loss: 0.000510963
+Epoch 900, Loss: 0.000412885
+Epoch 1000, Loss: 0.000343582
+Epoch 1100, Loss: 0.000292583
+Epoch 1200, Loss: 0.000253747
+Epoch 1300, Loss: 0.000223323
+Epoch 1400, Loss: 0.000198926
+Epoch 1500, Loss: 0.000178977
+Epoch 1600, Loss: 0.000162393
+Epoch 1700, Loss: 0.000148412
+Epoch 1800, Loss: 0.000136482
+Epoch 1900, Loss: 0.000126194
 Train Accuracy: 100%
-Train Time: 30ms
-Overhead: 20ms
-Total Time: 50ms
+Train Time: 3378 ms

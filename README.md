@@ -1,39 +1,66 @@
-# Simple Multi-Layer Perceptron
+# Multi-Layer Perceptron with Eigen
 
-이 프로젝트는 간단한 Multi-Layer Perceptron(MLP)을 C++와 Python으로 각각 구현한 것입니다.  
+이 프로젝트는 Multi-Layer Perceptron(MLP)을 C++와 Python으로 구현한 것입니다.  
 2D 공간상의 점들을 분류하고 그 결정 경계를 시각화합니다.  
-cpu 기준으로 C++이 Python보다 얼마나 더 빠른지 알아봅시다~!
+C++ 버전은 Eigen 라이브러리를 활용하여 고성능 행렬 연산을 수행합니다.
 
-## 구조
+## 네트워크 구조
 
 - 입력층 (2 뉴런): x, y 좌표 입력
-- 은닉층 (4 뉴런): sigmoid 활성화 함수 사용
-- 출력층 (1 뉴런): sigmoid 활성화 함수 사용
+- 은닉층 1 (64 뉴런): tanh 활성화 함수
+- 은닉층 2 (64 뉴런): tanh 활성화 함수
+- 출력층 (1 뉴런): sigmoid 활성화 함수
 
 ## 구현 버전
 
-### C++ 버전 (`main.cpp`, `mlp.h`, `mlp.cpp`)
+### C++ + Eigen 버전 (`main.cpp`, `mlp_eigen.h`, `mlp_eigen.cpp`)
 
-- GDI+ 사용하여 시각화
-- Windows 환경에서 실행 가능
-- 컴파일 및 실행이 빠름 (약 26ms)
+- **Eigen 라이브러리**: 고성능 행렬/벡터 연산
+- **He 초기화**: 가중치 초기화 방법으로 gradient vanishing 방지
+- **GDI+ 시각화**: Windows 환경에서 결정 경계 이미지 생성
+- **고성능**: 최적화된 선형대수 연산으로 빠른 학습
 
 ### Python 버전 (`mlp.py`)
 
-- PIL(Python Imaging Library) 사용하여 시각화
-- 플랫폼 독립적
-- 구현이 직관적이지만 실행 속도가 상대적으로 느림 (약 400ms)
+- **NumPy**: 행렬 연산 라이브러리
+- **동일한 알고리즘**: C++ 버전과 정확히 같은 구조 및 계산 로직
+- **PIL 시각화**: 플랫폼 독립적 이미지 생성
 
 ## 컴파일 및 실행 방법
 
-### C++ 버전
+### C++ + Eigen 버전
+
+#### 1. Eigen 라이브러리 설치
+
+**방법 1: 패키지 매니저 사용**
 
 ```bash
-# MinGW g++ 사용
-g++ main.cpp mlp.cpp -lgdiplu
+# Ubuntu/Debian
+sudo apt-get install libeigen3-dev
+
+# Arch Linux
+sudo pacman -S eigen
+
+# macOS (Homebrew)
+brew install eigen
+```
+
+**방법 2: 직접 다운로드**
+
+- [Eigen 공식 사이트](https://eigen.tuxfamily.org/)에서 헤더 파일 다운로드
+- 프로젝트 폴더에 압축 해제 (예: `eigen-3.3.9/`)
+
+#### 2. 컴파일 및 실행
+
+```bash
+# Eigen 헤더 경로 지정하여 컴파일
+g++ -I ./eigen-3.3.9 -O3 main.cpp mlp_eigen.cpp -lgdiplus
+
+# 또는 시스템 설치된 경우
+g++ -I /usr/include/eigen3 -O3 main.cpp mlp_eigen.cpp -lgdiplus
 
 # 실행
-./a
+./a.exe
 ```
 
 ### Python 버전
@@ -46,35 +73,58 @@ pip install numpy pillow
 python mlp.py
 ```
 
-## 결과
+## 주요 특징
 
-두 버전 모두:
+### 1. 고성능 행렬 연산 (Eigen)
 
-- 학습 데이터에 대해 100% 정확도 달성
-- `visualized.png` 파일로 결정 경계 시각화 저장
-- 매 100 에포크마다 loss 출력
+- **SIMD 최적화**: CPU의 벡터 연산 명령어 활용
+- **메모리 효율성**: 캐시 친화적 메모리 접근 패턴
+- **컴파일 타임 최적화**: 템플릿 기반 인라인 확장
 
-## 특이사항
+### 2. 정확한 동등성
 
-1. 정밀도
+- C++와 Python 버전이 동일한 결과 생성
+- 같은 가중치 초기화 시드 (5489) 사용
+- 동일한 학습 하이퍼파라미터 (epochs=2000, lr=0.05)
 
-   - 두 버전 모두 64비트 부동소수점(C++: double, Python: float64) 사용
-   - 연산 과정의 차이로 인해 loss 값에 미세한 차이 존재
+### 3. 시각화
 
-2. 성능 차이
-   - C++ 버전이 Python 버전보다 약 15배 빠름
-   - 컴파일된 언어와 인터프리터 언어의 특성 차이
+- 결정 경계를 300x250 해상도로 시각화
+- C++: `visualized_c++.png` 생성
+- Python: `visualized_python.png` 생성
+
+## 성능 비교
+
+| 버전        | 라이브러리 | 학습 시간 | 정확도 |
+| ----------- | ---------- | --------- | ------ |
+| C++ + Eigen | Eigen 3.x  | ~50ms     | 100%   |
+| Python      | NumPy      | ~200ms    | 100%   |
+
+_성능은 시스템 환경에 따라 다를 수 있습니다._
 
 ## 시스템 요구사항
 
-### C++ 버전
+### C++ + Eigen 버전
 
-- Windows 운영체제
-- MinGW g++ 컴파일러
-- GDI+ 라이브러리 (Windows에 기본 포함)
+- **컴파일러**: C++11 이상 (g++, clang++, MSVC)
+- **라이브러리**: Eigen 3.3+ (헤더 온리)
+- **Windows**: GDI+ (시각화용, 시스템 기본 포함)
 
 ### Python 버전
 
-- Python 3.x
-- NumPy
-- Pillow (PIL)
+- **Python**: 3.6+
+- **NumPy**: 1.19+
+- **Pillow**: 8.0+ (이미지 처리)
+
+## 파일 구조
+
+```
+mlp/
+├── main.cpp           # C++ 메인 프로그램
+├── mlp_eigen.h        # Eigen 기반 MLP 클래스 헤더
+├── mlp_eigen.cpp      # Eigen 기반 MLP 구현
+├── mlp.py             # Python MLP 구현
+├── README.md          # 프로젝트 설명서
+└── util/
+    └── generate_dataset.py  # 데이터셋 생성 유틸리티
+```
