@@ -8,6 +8,15 @@
 
 using namespace Gdiplus;
 
+// GDI+ 리소스를 위한 커스텀 deleter
+struct GdiPlusDeleter {
+    void operator()(GdiplusStartupInput* input) { 
+        GdiplusShutdown(gdiplusToken); 
+        delete input;
+    }
+    ULONG_PTR gdiplusToken;
+};
+
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid) {
     UINT num = 0;
     UINT size = 0;
@@ -38,9 +47,11 @@ void saveVisualization(const MLP& mlp,
                       const std::vector<std::vector<double>>& data,
                       const std::vector<double>& labels,
                       const wchar_t* filename) {
-    GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR gdiplusToken;
-    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    // GDI+ 초기화를 RAII로 관리
+    auto gdiplusInput = std::make_unique<GdiplusStartupInput>();
+    GdiPlusDeleter deleter;
+    GdiplusStartup(&deleter.gdiplusToken, gdiplusInput.get(), NULL);
+    std::unique_ptr<GdiplusStartupInput, GdiPlusDeleter> gdiplus(gdiplusInput.release(), deleter);
 
     const int width = 300;
     const int height = 250;
@@ -60,8 +71,10 @@ void saveVisualization(const MLP& mlp,
             int g = static_cast<int>((1 - output) * 206 + output * 105);
             int b = static_cast<int>((1 - output) * 235 + output * 180);
 
-            SolidBrush brush(Color(255, r, g, b));
-            graphics.FillRectangle(&brush, x, y, step, step);
+            {
+                SolidBrush brush(Color(255, r, g, b));
+                graphics.FillRectangle(&brush, x, y, step, step);
+            } // brush는 여기서 자동으로 해제됨
         }
     }
 
@@ -74,17 +87,18 @@ void saveVisualization(const MLP& mlp,
         Color pointColor = (labels[i] == 1) 
             ? Color(255, 255, 0, 0)
             : Color(255, 0, 0, 255);
-        SolidBrush fillBrush(pointColor);
-
-        float radius = 6.0f;
-        graphics.FillEllipse(&fillBrush, x - radius, y - radius, radius * 2, radius * 2);
+            
+        {
+            SolidBrush fillBrush(pointColor);
+            float radius = 6.0f;
+            graphics.FillEllipse(&fillBrush, x - radius, y - radius, radius * 2, radius * 2);
+        } // fillBrush는 여기서 자동으로 해제됨
     }
 
     // PNG 저장
     CLSID pngClsid;
     GetEncoderClsid(L"image/png", &pngClsid);
     bitmap.Save(filename, &pngClsid, NULL);
-    GdiplusShutdown(gdiplusToken);
 }
 
 int main() {
@@ -112,7 +126,10 @@ int main() {
     // 결과를 이미지 파일로 저장
     saveVisualization(mlp, data, labels, L"visualized.png");
     
-    std::cout << "시각화가 'visualized.png' 파일로 저장되었습니다." << std::endl;
-    
+    std::cout << "--------------------------------" << std::endl;
+    std::cout << "Saved Result: visualized.png" << std::endl;
+    std::cout << "Training Accuracy: " << 100 * mlp.getAccuracy(data, labels) << "%" << std::endl;
+    std::cout << "Training Time: " << mlp.getTrainingTime() << "ms" << std::endl;
+    std::cout << std::endl;
     return 0;
 }

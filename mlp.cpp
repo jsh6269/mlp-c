@@ -54,6 +54,7 @@ void MLP::train(const std::vector<std::vector<double>>& data,
                 const std::vector<double>& labels,
                 int epochs, 
                 double learning_rate) {
+    auto start = std::chrono::high_resolution_clock::now();
     for(int epoch = 0; epoch < epochs; epoch++) {
         double total_loss = 0;
         
@@ -108,4 +109,23 @@ void MLP::train(const std::vector<std::vector<double>>& data,
                       << "Loss: " << total_loss/data.size() << std::endl;
         }
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    training_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+}
+
+double MLP::getAccuracy(const std::vector<std::vector<double>>& data, 
+                       const std::vector<double>& labels) const {
+    int correct = 0;
+    for(size_t i = 0; i < data.size(); i++) {
+        double x = data[i][0];
+        double y = data[i][1];
+        double target = labels[i];
+        double output = forward(x, y);
+        if(std::abs(output - target) < 0.5) correct++;
+    }
+    return static_cast<double>(correct) / data.size();
+}
+
+double MLP::getTrainingTime() const {
+    return training_time;
 }
