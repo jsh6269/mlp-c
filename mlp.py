@@ -51,7 +51,7 @@ class MLP:
 
         return output
 
-    def train(self, data, labels, epochs=2000, learning_rate=0.05):
+    def train(self, data, labels, epochs=2000, learning_rate=0.08):
         start = time.time()
         data = np.array(data)
         labels = np.array(labels)

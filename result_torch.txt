@@ -1,26 +1,26 @@
 $ python mlp_torch.py
 
 Epoch 0, Loss: 0.747993
-Epoch 100, Loss: 0.411469
-Epoch 200, Loss: 0.308892
-Epoch 300, Loss: 0.270883
-Epoch 400, Loss: 0.253903
-Epoch 500, Loss: 0.242513
-Epoch 600, Loss: 0.232169
-Epoch 700, Loss: 0.221372
-Epoch 800, Loss: 0.209686
-Epoch 900, Loss: 0.197171
-Epoch 1000, Loss: 0.184164
-Epoch 1100, Loss: 0.171137
-Epoch 1200, Loss: 0.158551
-Epoch 1300, Loss: 0.146751
-Epoch 1400, Loss: 0.135930
-Epoch 1500, Loss: 0.126146
-Epoch 1600, Loss: 0.117371
-Epoch 1700, Loss: 0.109525
-Epoch 1800, Loss: 0.102511
-Epoch 1900, Loss: 0.096227
+Epoch 100, Loss: 0.338975
+Epoch 200, Loss: 0.266588
+Epoch 300, Loss: 0.244647
+Epoch 400, Loss: 0.227979
+Epoch 500, Loss: 0.209736
+Epoch 600, Loss: 0.189463
+Epoch 700, Loss: 0.168645
+Epoch 800, Loss: 0.149108
+Epoch 900, Loss: 0.131956
+Epoch 1000, Loss: 0.117424
+Epoch 1100, Loss: 0.105267
+Epoch 1200, Loss: 0.095085
+Epoch 1300, Loss: 0.086488
+Epoch 1400, Loss: 0.079149
+Epoch 1500, Loss: 0.072810
+Epoch 1600, Loss: 0.067272
+Epoch 1700, Loss: 0.062387
+Epoch 1800, Loss: 0.058038
+Epoch 1900, Loss: 0.054141
 --------------------------------
 Saved Result: visualized_torch.png
-Train Accuracy: 97%
-Train Time: 3497ms
+Train Accuracy: 100%
+Train Time: 3251ms

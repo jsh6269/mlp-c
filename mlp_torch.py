@@ -32,7 +32,7 @@ class MLP(nn.Module):
         return x
 
 
-def train_model(model, data, labels, epochs=2000, lr=0.05):
+def train_model(model, data, labels, epochs=2000, lr=0.08):
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     criterion = nn.BCELoss()
     start = time.time()
